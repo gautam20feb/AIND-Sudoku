@@ -1,8 +1,40 @@
 assignments = []
 
+# to be used to define the naming of the sudoku i.e. boxes
 rows = 'ABCDEFGHI'
 cols = '123456789'
 all_digits = '123456789'
+
+def cross(A, B):
+    "Cross product of elements in A and elements in B."
+    pass
+    return [s + t for s in A for t in B]
+
+# Creating the keys for all the boxes
+boxes = cross(rows, cols)
+
+# Creating units where each one of them follow the sudoku constraint
+# Row units
+row_units = [cross(r, cols) for r in rows]
+
+# all the column units
+column_units = [cross(rows, c) for c in cols]
+
+# all the 3x3 squares
+square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', '456', '789')]
+
+# additional diagonal units
+diagonal_units = [['A1', 'B2', 'C3', 'D4', 'E5', 'F6', 'G7', 'H8', 'I9'],
+                  ['I1', 'H2', 'G3', 'F4', 'E5', 'D6', 'C7', 'B8', 'A9']]
+
+# all the units together so that we can iterate each one them while using the constraint propagation to reduce the search space
+unitlist = row_units + column_units + square_units + diagonal_units
+
+# dictonary of boxes and its units
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+
+# dictonary of boxes and its peers
+peers = dict((s, set(sum(units[s], [])) - set([s])) for s in boxes)
 
 
 def assign_value(values, box, value):
@@ -27,38 +59,36 @@ def naked_twins(values):
 
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
-    for unit in unitlist:
-        key_length_2 = [box for box in unit if len(values[box]) == 2]
-        naked_dict = dict(zip(key_length_2, [values[key] for key in key_length_2]))
 
+    # For each unit in the all units(constraints)
+    for unit in unitlist:
+        # find the boxes which have search space of length two
+        key_length_2 = [box for box in unit if len(values[box]) == 2]
+        two_dict = dict(zip(key_length_2, [values[key] for key in key_length_2]))
+
+        # find the naked twins and their keys. To do so reverse the dictonary and find keys of length 2 in this new dictionary
         rev_multidict = {}
-        for key, value in naked_dict.items():
+        for key, value in two_dict.items():
             rev_multidict.setdefault(value, set()).add(key)
+
         naked_twin = ([key for key, values in rev_multidict.items() if len(values) == 2])
+
+        # If there is a naked twin in this unit
         if len(naked_twin) > 0:
+            # get the keys with this naked twin
             naked_twin_keys = rev_multidict[naked_twin[0]]
+
+            # remove naked twin from search space of all other boxes in this unit
             for box in unit:
+                # make sure that we are not removing the search space of the naked twin boxes
                 if box not in naked_twin_keys:
+                    # reduce the seach space
                     for digit in naked_twin[0]:
                         values[box] = values[box].replace(digit, "")
 
     return values
 
-def cross(A, B):
-    "Cross product of elements in A and elements in B."
-    pass
-    return [s + t for s in A for t in B]
 
-
-boxes = cross(rows, cols)
-row_units = [cross(r, cols) for r in rows]
-column_units = [cross(rows, c) for c in cols]
-square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', '456', '789')]
-diagonal_units = [['A1', 'B2', 'C3', 'D4', 'E5', 'F6', 'G7', 'H8', 'I9'],
-                  ['I1', 'H2', 'G3', 'F4', 'E5', 'D6', 'C7', 'B8', 'A9']]
-unitlist = row_units + column_units + square_units + diagonal_units
-units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
-peers = dict((s, set(sum(units[s], [])) - set([s])) for s in boxes)
 
 def grid_values(grid):
     """
@@ -117,17 +147,17 @@ def only_choice(values):
 
 
 def reduce_puzzle(values):
-    solved_values = [box for box in values.keys() if len(values[box]) == 1]
+
+    # reduces the search space iteratively by applying each technique one by one (constraint propagation)
     stalled = False
     while not stalled:
-        display(values)
         # Check how many boxes have a determined value
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
         # Use the Eliminate Strategy
         values = eliminate(values)
         # Use the Only Choice Strategy
         values = only_choice(values)
-
+        # Use the Naked twin strategy
         values = naked_twins(values)
         # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
