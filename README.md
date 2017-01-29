@@ -3,9 +3,10 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: Naked twins is a Strategy to reduce the solution space for sudoku along with the already discussed elimination, only choice etc. Therefore, while solving for sudoku, we apply Naked twin constraint also to reduce the search space at each iteration.
-We make use of the Sudoku constraints while also utilising the naked twin technique. In this strategy, if there are two boxes in a unit with search space of size 2, it implies that according to this naked twin constraint that no other box of this unit can take any value from this search space. It is so because only these naked twin boxes will take the twin values. Thus, we reduce the search space of such non twin boxes.
-
+A: Naked twins is a Strategy to reduce the solution space of each box for sudoku along with the already discussed elimination, only choice etc. Therefore, while solving for sudoku, we apply Naked twin constraint also at each iteration.
+In this strategy, if there are two boxes in a unit with same search space of size 2, it implies that according to this naked twin constraint that no other box of this unit can take any value from this search space. It is so because only these naked twin boxes will take the twin values. Thus, we reduce the search space of such non twin boxes.
+As we enforce this naked twin constraint, it helps us introduces new constraints for other parts of the board that can help us further reduce the number of possibilities.
+The naked_twin() function implements this constraint and we use this function while we reduce the sudoku's search space.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
