@@ -3,11 +3,15 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: Naked twins is another method to reduce the solution space for sudoku along with the already discussed elimination, only choice etc. Therefore, while solving for sudoku, we apply Naked twin also to reduce the search space at each stage.
+We make use of the Sudoku constraints while utilising the naked twin technique.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: Diagonal Sudoku is a modified sudoko with addition constraint that the diagonals also have to follow the constraint that along these diagonals, only 1-9 digits come and only once.
+Therefore we identify these diagonals as a unit while defining the unit space and therefore, while defining the peers for any box, we also consider the peers along the diagonals(if any).
+So, when we apply our sudoku solving techniques, we look into the modified possibilities to reduce the search space.
+
 
 ### Install
 
