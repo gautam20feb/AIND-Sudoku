@@ -107,7 +107,6 @@ def grid_values(grid):
             chars.append(c)
         if c == '.':
             chars.append(all_digits)
-    assert len(chars) == 81
     return dict(zip(boxes, chars))
 
 
